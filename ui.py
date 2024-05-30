@@ -28,6 +28,11 @@ class Purger:
         self.progressbar["value"] = self.time_left
         self.current_countdown = None
 
+        self.correct = 0
+        self.incorrect = 0
+
+        self.feedback_label = tk.Label(root, text=f"Richtig: {self.correct}, Falsch: {self.incorrect}", bg="#222222", fg="#ffffff", font=("Arial", 14))
+        self.feedback_label.pack(padx=10, pady=10)
 
         self.html_label = tk.Label(root)
         self.html_label.pack(fill="both", expand=True)
@@ -48,6 +53,11 @@ class Purger:
         self.update_progressbar()
 
     def answer(self, answer):
+        if (answer == 1 and self.currently_picked_folder == 'Differenz') or (answer == 2 and self.currently_picked_folder == 'Division'):
+            self.correct += 1
+        else:
+            self.incorrect += 1
+        self.feedback_label.config(text=f"Richtig: {self.correct}, Falsch: {self.incorrect}")
         self.reset_progressbar()
 
     def load_file(self):
