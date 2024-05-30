@@ -1,6 +1,7 @@
 import os
 import shutil
 import tkinter as tk
+from tkinter import ttk
 # pillow
 from PIL import Image, ImageTk
 import random
@@ -19,6 +20,15 @@ class Purger:
 
         self.root.configure(bg="#222222")  # Set background color to dark gray
 
+        tk.Label(root, text="Wähle mit den Pfeiltasten den passenden Begriff aus (← →). Sei schnell!", bg="#222222", fg="#ffffff", font=("Arial", 14)).pack(padx=10, pady=10)
+
+        self.progressbar = ttk.Progressbar(maximum=2000, mode="determinate")
+        self.progressbar.pack(fill="x", padx=10, pady=10)
+        self.time_left = 2000
+        self.progressbar["value"] = self.time_left
+        self.current_countdown = None
+
+
         self.html_label = tk.Label(root)
         self.html_label.pack(fill="both", expand=True)
         self.img_label = tk.Label(root)
@@ -26,10 +36,10 @@ class Purger:
 
         self.load_file()
 
-        self.btn_1 = tk.Button(root, text="← Differenz", command=lambda: self.answer(1), bg="#333333", fg="#ffffff", font=("Arial", 14))
+        self.btn_1 = tk.Button(root, text="← Differenz", command=lambda: self.answer(1), bg="#333333", fg="#ffffff", font=("Arial", 24))
         self.btn_1.pack(padx=10, pady=10, side=tk.LEFT, fill=tk.X)
 
-        self.btn_2 = tk.Button(root, text="Division →", command=lambda: self.answer(2), bg="#333333", fg="#ffffff", font=("Arial", 14))
+        self.btn_2 = tk.Button(root, text="Division →", command=lambda: self.answer(2), bg="#333333", fg="#ffffff", font=("Arial", 24))
         self.btn_2.pack(padx=10, pady=10, side=tk.RIGHT, fill=tk.X)
 
 
@@ -39,10 +49,10 @@ class Purger:
         root.bind("<Right>", lambda event: self.answer(2))
 
     def answer(self, answer):
-        print(f"Answer: {answer}")
         self.load_file()
 
     def load_file(self):
+        self.cancel_countdown()
         decide_from_which_folder = random.randint(0, 1) + 1
         if decide_from_which_folder == 1:
             relevant_img_list = self.image_list_1
@@ -59,6 +69,24 @@ class Purger:
             self.img_label.configure(image=img_tk)
             self.img_label.image = img_tk
 
+        self.update_progressbar()
+
+
+ 
+    def update_progressbar(self):
+        print(self.time_left)
+        self.progressbar["value"] = self.time_left
+        self.time_left -= 100
+        if self.time_left < 0:
+            self.load_file()
+            self.time_left = 2000
+        else:
+            self.current_countdown = self.root.after(100, self.update_progressbar)
+
+    def cancel_countdown(self):
+        if self.current_countdown:
+            self.root.after_cancel(self.current_countdown)
+            self.current_countdown = None
 
 if __name__ == "__main__":
     root = tk.Tk()
