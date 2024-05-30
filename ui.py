@@ -21,6 +21,7 @@ class Purger:
         self.root.configure(bg="#222222")  # Set background color to dark gray
 
         tk.Label(root, text="Wähle mit den Pfeiltasten den passenden Begriff aus (← →). Sei schnell!", bg="#222222", fg="#ffffff", font=("Arial", 14)).pack(padx=10, pady=10)
+        tk.Label(root, text="Drücke die Leertaste, wenn du bereit bist", bg="#222222", fg="#ffffff", font=("Arial", 14)).pack(padx=10, pady=10)
 
         self.progressbar = ttk.Progressbar(maximum=2000, mode="determinate")
         self.progressbar.pack(fill="x", padx=10, pady=10)
@@ -49,7 +50,11 @@ class Purger:
         # Bind arrow keys to button actions
         root.bind("<Left>", lambda event: self.answer(1))
         root.bind("<Right>", lambda event: self.answer(2))
+        root.bind("<space>", lambda event: self.start())
 
+
+
+    def start(self):
         self.load_file()
         self.update_progressbar()
 
@@ -76,8 +81,16 @@ class Purger:
             # resize to at least 200 height and 500 width
             height_resize_factor = 200 / img.height
             width_resize_factor = 500 / img.width
-            bigger_resize_factor = max(height_resize_factor, width_resize_factor, 1)
-            img_tk = ImageTk.PhotoImage(img.resize((int(img.width * bigger_resize_factor), int(img.height * bigger_resize_factor))))
+            resize_factor = max(height_resize_factor, width_resize_factor, 1)
+            # also make sure that img isnt wider or higher than root window
+            is_higher = img.height > self.root.winfo_height()
+            is_wider = img.width > self.root.winfo_width()
+            if is_higher:
+                resize_factor = self.root.winfo_height() / img.height
+            if is_wider:
+                resize_factor = self.root.winfo_width() / img.width
+
+            img_tk = ImageTk.PhotoImage(img.resize((int(img.width * resize_factor), int(img.height * resize_factor))))
             # Set image to label
             self.img_label.configure(image=img_tk)
             self.img_label.image = img_tk
@@ -101,7 +114,7 @@ class Purger:
 if __name__ == "__main__":
     root = tk.Tk()
     root.title("Sachen Unterscheiden")
-    root.geometry("800x600")  # Set initial window size
+    root.geometry("1400x800")  # Set initial window size
     root.configure(bg="#222222")  # Set background color to dark gray
     viewer = Purger(root)
     root.mainloop()
