@@ -30,8 +30,9 @@ class Purger:
 
         self.correct = 0
         self.incorrect = 0
+        self.too_slow = 0
 
-        self.feedback_label = tk.Label(root, text=f"Richtig: {self.correct}, Falsch: {self.incorrect}", bg="#222222", fg="#ffffff", font=("Arial", 14))
+        self.feedback_label = tk.Label(root, text=f"Richtig: {self.correct}, Falsch: {self.incorrect}, Zu langsam: {self.too_slow}", bg="#222222", fg="#ffffff", font=("Arial", 14))
         self.feedback_label.pack(padx=10, pady=10)
 
         self.html_label = tk.Label(root)
@@ -57,7 +58,7 @@ class Purger:
             self.correct += 1
         else:
             self.incorrect += 1
-        self.feedback_label.config(text=f"Richtig: {self.correct}, Falsch: {self.incorrect}")
+        self.feedback_label.config(text=f"Richtig: {self.correct}, Falsch: {self.incorrect}, Zu langsam: {self.too_slow}")
         self.reset_progressbar()
 
     def load_file(self):
@@ -72,11 +73,14 @@ class Purger:
         file_path = os.path.join(self.folder_path, 'problems', '00', self.currently_picked_folder, random_file)
         with open(os.path.join(self.folder_path, 'problems', '00', self.currently_picked_folder, random_file), 'rb') as file:
             img = Image.open(file)
-            img_tk = ImageTk.PhotoImage(img)
+            # resize to at least 200 height and 500 width
+            height_resize_factor = 200 / img.height
+            width_resize_factor = 500 / img.width
+            bigger_resize_factor = max(height_resize_factor, width_resize_factor, 1)
+            img_tk = ImageTk.PhotoImage(img.resize((int(img.width * bigger_resize_factor), int(img.height * bigger_resize_factor))))
             # Set image to label
             self.img_label.configure(image=img_tk)
             self.img_label.image = img_tk
-
 
  
     def update_progressbar(self):
@@ -84,6 +88,8 @@ class Purger:
         self.time_left += 10
         self.current_countdown = self.root.after(10, self.update_progressbar)
         if self.time_left >= 2000:
+            self.too_slow += 1
+            self.feedback_label.config(text=f"Richtig: {self.correct}, Falsch: {self.incorrect}, Zu langsam: {self.too_slow}")
             self.reset_progressbar()
 
     def reset_progressbar(self):
