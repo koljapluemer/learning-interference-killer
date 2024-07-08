@@ -1,0 +1,15 @@
+{
+  "title": "Interference Killer",
+  "subtitle": "",
+  "status": "alpha",
+  "showOnPortfolio": false,
+  "showAboveFold": false,
+  "imageAltProperty": "Screenshot of Interference Killer",
+  "languages": [],
+  "links": [
+    {
+      "title": "See on GitHub",
+      "url": "https://github.com/koljapluemer/interference-killer"
+    }
+  ]
+}
